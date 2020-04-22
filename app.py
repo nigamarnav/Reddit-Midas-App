@@ -38,49 +38,49 @@ tokenizer = TweetTokenizer()
 lsa = TruncatedSVD(n_components=10, n_iter=10, random_state=3)
 	
 def expandContractions(text, c_re=c_re):
-    def replace(match):
-        return c_dict[match.group(0)]
-    return c_re.sub(replace, text)
+	def replace(match):
+		return c_dict[match.group(0)]
+	return c_re.sub(replace, text)
 	
 def get_word_net_pos(treebank_tag):
-    if treebank_tag.startswith('J'):
+	if treebank_tag.startswith('J'):
 		return wordnet.ADJ
-    elif treebank_tag.startswith('V'):
-        return wordnet.VERB
-    elif treebank_tag.startswith('N'):
-        return wordnet.NOUN
-    elif treebank_tag.startswith('R'):
-        return wordnet.ADV
-    else:
-        return None
+	elif treebank_tag.startswith('V'):
+		return wordnet.VERB
+	elif treebank_tag.startswith('N'):
+		return wordnet.NOUN
+	elif treebank_tag.startswith('R'):
+		return wordnet.ADV
+	else:
+		return None
 	
 def casual_tokenizer(text): #Splits words on white spaces (leaves contractions intact) and splits out trailing punctuation
-    tokens = tokenizer.tokenize(text)
-    return tokens
+	tokens = tokenizer.tokenize(text)
+	return tokens
 
 def lemma_wordnet(tagged_text):
-    final = []
-    for word, tag in tagged_text:
-        wordnet_tag = get_word_net_pos(tag)
-        if wordnet_tag is None:
-            final.append(lemmatizer.lemmatize(word))
-        else:
-            final.append(lemmatizer.lemmatize(word, pos=wordnet_tag))
-    return final
+	final = []
+	for word, tag in tagged_text:
+		wordnet_tag = get_word_net_pos(tag)
+		if wordnet_tag is None:
+			final.append(lemmatizer.lemmatize(word))
+		else:
+			final.append(lemmatizer.lemmatize(word, pos=wordnet_tag))
+	return final
 		
 def process_text(text):
-    soup = BeautifulSoup(text, "lxml")
-    tags_del = soup.get_text()
-    no_html = re.sub('<[^>]*>', '', tags_del)
-    tokenized = casual_tokenizer(no_html)
-    lower = [item.lower() for item in tokenized]
-    decontract = [expandContractions(item, c_re=c_re) for item in lower]
-    tagged = nltk.pos_tag(decontract)
-    lemma = lemma_wordnet(tagged)
-    no_num = [re.sub('[0-9]+', '', each) for each in lemma]
-    no_punc = [w for w in no_num if w not in punc]
-    no_stop = [w for w in no_punc if w not in stop_words]
-    return no_stop
+	soup = BeautifulSoup(text, "lxml")
+	tags_del = soup.get_text()
+	no_html = re.sub('<[^>]*>', '', tags_del)
+	tokenized = casual_tokenizer(no_html)
+	lower = [item.lower() for item in tokenized]
+	decontract = [expandContractions(item, c_re=c_re) for item in lower]
+	tagged = nltk.pos_tag(decontract)
+	lemma = lemma_wordnet(tagged)
+	no_num = [re.sub('[0-9]+', '', each) for each in lemma]
+	no_punc = [w for w in no_num if w not in punc]
+	no_stop = [w for w in no_punc if w not in stop_words]
+	return no_stop
 	
 # prediction function 
 def ValuePredictor(to_predict_list): 
