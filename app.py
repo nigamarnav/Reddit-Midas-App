@@ -44,7 +44,7 @@ def expandContractions(text, c_re=c_re):
 	
 def get_word_net_pos(treebank_tag):
     if treebank_tag.startswith('J'):
-        return wordnet.ADJ
+		return wordnet.ADJ
     elif treebank_tag.startswith('V'):
         return wordnet.VERB
     elif treebank_tag.startswith('N'):
