@@ -20,14 +20,9 @@ app = flask.Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+	return render_template("index.html")
 	
-c_dict = {
-  "ain't": "am not",
-  "aren't": "are not",
-  "can't": "cannot",
-  "can't've": "cannot have",
-}	
+c_dict = {"ain't": "am not", "aren't": "are not", "can't": "cannot","can't've": "cannot have"}	
 add_stop = ['', ' ', 'say', 's', 'u', 'ap', 'afp', '...', 'n', '\\']
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df = 1, max_df = .95)
 stop_words = ENGLISH_STOP_WORDS.union(add_stop)
@@ -123,4 +118,4 @@ def result():
 		return render_template("result.html", prediction = prediction) 
 		
 if __name__ == '__main__':
-    app.run(debug=True)
+	app.run(debug=True)
