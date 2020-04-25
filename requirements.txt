@@ -7,4 +7,3 @@ nltk
 bs4
 lxml
 HTMLParser
-urllib
