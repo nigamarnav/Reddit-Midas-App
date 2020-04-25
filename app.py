@@ -1,6 +1,10 @@
 # Load libraries
+from html.parser import HTMLParser
+from urllib.request import urlopen
+import urllib
 import flask
 from flask import Flask, jsonify, render_template, request
+from werkzeug import secure_filename
 import pandas as pd
 from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 import pickle
@@ -89,7 +93,7 @@ def ValuePredictor(to_predict_list):
 @app.route('/result', methods = ['POST']) 
 def result():
 	if request.method == 'POST':
-		to_predict_list = request.form['text']
+		to_predict_list = request.form['title'] + " " + request.form['Post']
 		result = ValuePredictor(to_predict_list)
 		if int(result)== 0:
 			prediction='AskIndia'
@@ -116,6 +120,76 @@ def result():
 		elif int(result)== 11:
 			prediction ='[R]eddiquette'
 		return render_template("result.html", prediction = prediction) 
+		
+		
+def error_callback(*_, **__):
+    pass
+
+def is_string(data):
+    return isinstance(data, str)
+
+def is_bytes(data):
+    return isinstance(data, bytes)
+
+def to_ascii(data):
+    if is_string(data):
+        data = data.encode('ascii', errors='ignore')
+    elif is_bytes(data):
+        data = data.decode('ascii', errors='ignore')
+    else:
+        data = str(data).encode('ascii', errors='ignore')
+    return data
+
+
+class Parser(HTMLParser):
+    def __init__(self, url):
+        self.title = None
+        self.rec = False
+        HTMLParser.__init__(self)
+        try:
+            self.feed(to_ascii(urlopen(url).read()))
+        except urllib.error.HTTPError:
+            return
+        except urllib.error.URLError:
+            return
+        except ValueError:
+            return
+
+        self.rec = False
+        self.error = error_callback
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'title':
+            self.rec = True
+
+    def handle_data(self, data):
+        if self.rec:
+            self.title = data
+
+    def handle_endtag(self, tag):
+        if tag == 'title':
+            self.rec = False
+
+
+def get_title(url):
+    return Parser(url).title
+		
+@app.route('/automated_testing', methods = ['POST'])
+def testing():
+	result = []
+	url = []
+	if request.method == 'POST':
+		file = request.files['files']
+		filename = secure_filename(file.filename)
+		
+		with open(filename) as f:
+			file_line = f.readline()
+			to_predict_list = get_title(file_line)
+			r = ValuePredictor(to_predict_list)
+			url.append(file_line)
+			result.append(r)
+		return jasonify(key=url, value=result)
+			
 		
 if __name__ == '__main__':
 	app.run(debug=True)

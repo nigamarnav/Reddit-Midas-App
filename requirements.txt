@@ -6,3 +6,6 @@ sklearn
 nltk
 bs4
 lxml
+HTMLParser
+urlopen
+urllib
