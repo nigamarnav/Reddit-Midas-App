@@ -7,3 +7,4 @@ nltk
 bs4
 lxml
 HTMLParser
+werkzeug
