@@ -7,5 +7,4 @@ nltk
 bs4
 lxml
 HTMLParser
-werkzeug
-secure_filename
+

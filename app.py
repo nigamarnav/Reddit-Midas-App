@@ -4,7 +4,6 @@ from urllib.request import urlopen
 import urllib
 import flask
 from flask import Flask, jsonify, render_template, request
-from werkzeug import secure_filename
 import pandas as pd
 from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 import pickle
@@ -180,9 +179,8 @@ def testing():
 	url = []
 	if request.method == 'POST':
 		file = request.files['files']
-		filename = secure_filename(file.filename)
 		
-		with open(filename) as f:
+		with open(file) as f:
 			file_line = f.readline()
 			to_predict_list = get_title(file_line)
 			r = ValuePredictor(to_predict_list)
